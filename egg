@@ -76,7 +76,7 @@ local function RemoveEgg(object)
 end
 
 local function CheckAllEggs()
-    task.wait(2)
+    task.wait(3)
 
     for _, petName in pairs(activeEggs) do
         if petName == TARGET_PET_NAME then
