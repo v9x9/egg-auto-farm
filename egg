@@ -14,10 +14,14 @@ if queue_on_teleport then
     ]])
 end
 
-while playerGui:FindFirstChild("LoadingScreen") do
+local function waitForLoadingEnd()
+    while playerGui:FindFirstChild("LoadingScreen") ~= nil do
+        task.wait(1)
+    end
     task.wait(1)
 end
-task.wait(1)
+
+waitForLoadingEnd()
 
 local hatchFunction = getupvalue(getupvalue(getconnections(replicatedStorage.GameEvents.PetEggService.OnClientEvent)[1].Function, 1), 2)
 local eggModels = getupvalue(hatchFunction, 1)
@@ -52,10 +56,13 @@ local function AddEgg(object)
     if object:GetAttribute("OWNER") ~= localPlayer.Name then return end
 
     local objectId = object:GetAttribute("OBJECT_UUID")
+    local petName = eggPets[objectId]
+    if not objectId or not petName then return end
+
     local eggName = object:GetAttribute("EggName")
-    local esp = CreateEspGui(object, eggName .. " | ?")
+    local esp = CreateEspGui(object, `{eggName} | {petName}`)
     espCache[objectId] = esp
-    activeEggs[objectId] = nil
+    activeEggs[objectId] = petName
 end
 
 local function RemoveEgg(object)
@@ -68,31 +75,8 @@ local function RemoveEgg(object)
     activeEggs[objectId] = nil
 end
 
-for _, object in collectionService:GetTagged("PetEggServer") do
-    task.spawn(AddEgg, object)
-end
-
-collectionService:GetInstanceAddedSignal("PetEggServer"):Connect(AddEgg)
-collectionService:GetInstanceRemovedSignal("PetEggServer"):Connect(RemoveEgg)
-
-task.spawn(function()
-    while true do
-        local allLoaded = true
-        for objectId, _ in pairs(activeEggs) do
-            local petName = eggPets[objectId]
-            if petName == nil then
-                allLoaded = false
-            else
-                activeEggs[objectId] = petName
-                if espCache[objectId] and espCache[objectId]:FindFirstChild("TextLabel") then
-                    espCache[objectId].TextLabel.Text = petName
-                end
-            end
-        end
-
-        if allLoaded then break end
-        task.wait(2)
-    end
+local function CheckAllEggs()
+    task.wait(2)
 
     for _, petName in pairs(activeEggs) do
         if petName == TARGET_PET_NAME then
@@ -101,4 +85,13 @@ task.spawn(function()
     end
 
     teleportService:TeleportToPlaceInstance(PLACE_ID, game.JobId, localPlayer)
-end)
+end
+
+for _, object in collectionService:GetTagged("PetEggServer") do
+    task.spawn(AddEgg, object)
+end
+
+collectionService:GetInstanceAddedSignal("PetEggServer"):Connect(AddEgg)
+collectionService:GetInstanceRemovedSignal("PetEggServer"):Connect(RemoveEgg)
+
+task.delay(4, CheckAllEggs)
