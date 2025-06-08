@@ -69,7 +69,7 @@ local function RemoveEgg(object)
 end
 
 local function CheckAllEggs()
-    task.wait(0.5)
+    task.wait(2)
 
     for _, petName in pairs(activeEggs) do
         if petName == TARGET_PET_NAME then
@@ -89,4 +89,4 @@ end
 collectionService:GetInstanceAddedSignal("PetEggServer"):Connect(AddEgg)
 collectionService:GetInstanceRemovedSignal("PetEggServer"):Connect(RemoveEgg)
 
-task.delay(1, CheckAllEggs)
+task.delay(2, CheckAllEggs)
