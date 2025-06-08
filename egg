@@ -8,13 +8,20 @@ local playerGui = localPlayer:WaitForChild("PlayerGui")
 local PLACE_ID = 126884695634066
 local TARGET_PET_NAME = "Raccoon"
 
-repeat task.wait() until not playerGui:FindFirstChild("LoadingScreen")
-
 if queue_on_teleport then
     queue_on_teleport([[
         loadstring(game:HttpGet("https://raw.githubusercontent.com/v9x9/egg-auto-farm/refs/heads/main/egg"))()
     ]])
 end
+
+local function waitForLoadingEnd()
+    while playerGui:FindFirstChild("LoadingScreen") ~= nil do
+        task.wait(1)
+    end
+    task.wait(1)
+end
+
+waitForLoadingEnd()
 
 local hatchFunction = getupvalue(getupvalue(getconnections(replicatedStorage.GameEvents.PetEggService.OnClientEvent)[1].Function, 1), 2)
 local eggModels = getupvalue(hatchFunction, 1)
@@ -73,12 +80,10 @@ local function CheckAllEggs()
 
     for _, petName in pairs(activeEggs) do
         if petName == TARGET_PET_NAME then
-            warn("Y'a un Raccoon Diddy Blud")
             return
         end
     end
 
-    warn("Y'a pas de Raccoon Diddy Blud")
     teleportService:TeleportToPlaceInstance(PLACE_ID, game.JobId, localPlayer)
 end
 
@@ -89,4 +94,4 @@ end
 collectionService:GetInstanceAddedSignal("PetEggServer"):Connect(AddEgg)
 collectionService:GetInstanceRemovedSignal("PetEggServer"):Connect(RemoveEgg)
 
-task.delay(2, CheckAllEggs)
+task.delay(4, CheckAllEggs)
