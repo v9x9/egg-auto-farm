@@ -91,7 +91,7 @@ task.spawn(function()
         end
 
         if allLoaded then break end
-        task.wait(0.5)
+        task.wait(2)
     end
 
     for _, petName in pairs(activeEggs) do
