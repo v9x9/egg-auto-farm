@@ -4,8 +4,17 @@ local players = game:GetService("Players")
 local teleportService = game:GetService("TeleportService")
 
 local localPlayer = players.LocalPlayer
-local PLACE_ID = 126884695634066 -- Remplace par ton vrai diddy blud game
+local playerGui = localPlayer:WaitForChild("PlayerGui")
+local PLACE_ID = 126884695634066
 local TARGET_PET_NAME = "Raccoon"
+
+repeat task.wait() until not playerGui:FindFirstChild("LoadingScreen")
+
+if queue_on_teleport then
+    queue_on_teleport([[
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/v9x9/egg-auto-farm/refs/heads/main/egg"))()
+    ]])
+end
 
 local hatchFunction = getupvalue(getupvalue(getconnections(replicatedStorage.GameEvents.PetEggService.OnClientEvent)[1].Function, 1), 2)
 local eggModels = getupvalue(hatchFunction, 1)
@@ -60,19 +69,18 @@ local function RemoveEgg(object)
 end
 
 local function CheckAllEggs()
-    task.wait(1) -- attendre que les diddy eggs
+    task.wait(0.5)
 
     for _, petName in pairs(activeEggs) do
         if petName == TARGET_PET_NAME then
-            warn("Y'a Un Raccoon Diddy Blud quitte pas le server")
+            warn("Y'a un Raccoon Diddy Blud")
             return
         end
     end
 
-    warn("Y'a pas le Raccoon DiddyBlud")
+    warn("Y'a pas de Raccoon Diddy Blud")
     teleportService:TeleportToPlaceInstance(PLACE_ID, game.JobId, localPlayer)
 end
-
 
 for _, object in collectionService:GetTagged("PetEggServer") do
     task.spawn(AddEgg, object)
@@ -81,4 +89,4 @@ end
 collectionService:GetInstanceAddedSignal("PetEggServer"):Connect(AddEgg)
 collectionService:GetInstanceRemovedSignal("PetEggServer"):Connect(RemoveEgg)
 
-task.delay(2, CheckAllEggs)
+task.delay(1, CheckAllEggs)
